@@ -48,11 +48,7 @@ def mat_rotate(a):
     ]
 
 
-# Multiply and apply matrix to a point
-
-
 def mat_mul(A, B):
-    # Standard 3x3 multiplication
     M = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
     for r in range(3):
         for c in range(3):
@@ -60,8 +56,7 @@ def mat_mul(A, B):
     return M
 
 
-def apply_matrix(M, point):
-    x, y = point
-    x2 = M[0][0] * x + M[0][1] * y + M[0][2]
-    y2 = M[1][0] * x + M[1][1] * y + M[1][2]
-    return x2, y2
+def apply_matrix(M, x, y):
+    tx = M[0][0] * x + M[0][1] * y + M[0][2]
+    ty = M[1][0] * x + M[1][1] * y + M[1][2]
+    return tx, ty
