@@ -87,6 +87,48 @@ def tri_transformed(M, x1, y1, x2, y2, x3, y3, col, outline=False):
         pyxel.tri(tx1, ty1, tx2, ty2, tx3, ty3, col)
 
 
+def flower_transformed(M, cx, cy, r, col, num_petals=8):
+    for i in range(num_petals):
+        a0 = (math.pi * 2 / num_petals) * i
+        a1 = a0 + 0.4
+
+        x1, y1 = cx + math.cos(a0) * r, cy + math.sin(a0) * r
+        x2, y2 = cx + math.cos(a1) * r, cy + math.sin(a1) * r
+
+        tri_transformed(M, cx, cy, x1, y1, x2, y2, col)
+
+
+def ellipse_transformed(M, cx, cy, rx, ry, col, segments=32, outline=False):
+    # Precalculate the points of the circle
+    points = []
+    for i in range(segments):
+        a = (i / segments) * math.tau
+        x = cx + math.cos(a) * rx
+        y = cy + math.sin(a) * ry
+        tx, ty = apply_matrix(M, x, y)
+        points.append((tx, ty))
+
+    if outline:
+        # Connect successive transformed points
+        for i in range(segments):
+            x1, y1 = points[i]
+            x2, y2 = points[(i + 1) % segments]
+            pyxel.line(x1, y1, x2, y2, col)
+
+    else:
+        # Fill by triangulating around the center
+        cx_t, cy_t = apply_matrix(M, cx, cy)
+        for i in range(segments):
+            x1, y1 = points[i]
+            x2, y2 = points[(i + 1) % segments]
+            pyxel.tri(cx_t, cy_t, x1, y1, x2, y2, col)
+
+
+def circle_transformed(M, cx, cy, r, col, segments=32, outline=False):
+    # A circle is just an ellipse with the same x/y radius
+    ellipse_transformed(M, cx, cy, r, r, col, segments, outline)
+
+
 pyxel.init(200, 150, title="Matrix Transform Demo")
 
 # assign some positions for "stars"
@@ -112,7 +154,7 @@ M = [  # identiy matrix
 
 def update():
     global M, angle
-    angle += 0.03
+    angle += 0.03  # increment rotation every frame
 
     # Pulsating scale
     s = 1 + 0.5 * math.sin(angle * 2)
@@ -128,34 +170,32 @@ def update():
 def draw():
     pyxel.cls(0)
 
-    # Rendeer a triangle with the matrix transform
-    tri_transformed(M, -20, -10, 20, -10, 0, 20, 11)
+    # Rendeer a triangle
+    tri_transformed(M, -20, -10, 20, -10, 0, 20, col=11)
 
     # Render a rectangle
-    quad_transformed(M, -15, -15, 15, -15, 15, 15, -15, 15, 8)
+    quad_transformed(M, -15, -15, 15, -15, 15, 15, -15, 15, col=8)
 
-    # Alternatively, render a rectangle as two triangles
-    tri_transformed(M, -5, -5, 5, -5, 5, 5, 9)
-    tri_transformed(M, -5, -5, 5, 5, -5, 5, 9)
+    # Render a rectangle outline
+    quad_transformed(M, -20, -20, 20, -20, 20, 20, -20, 20, col=5, outline=True)
 
-    # render some "stars"
+    # Alternatively, render a rectangle as two triangles explicitly
+    tri_transformed(M, -5, -5, 5, -5, 5, 5, col=9)
+    tri_transformed(M, -5, -5, 5, 5, -5, 5, col=9)
+
+    # Render a flower shape
+    flower_transformed(M, 0, 0, 25, col=10, num_petals=3)
+
+    # Render a circle
+    circle_transformed(M, 0, 0, 10, col=12)
+
+    # Render a circle outline
+    circle_transformed(M, 0, 0, 14, col=13, outline=True)
+
+    # Render some "stars"
     for sx, sy in stars:
         tx, ty = apply_matrix(M, sx, sy)
         pyxel.pset(int(tx), int(ty), 7)
-
-    # flower shape
-    num_petals = 8
-    radius = 25
-
-    for i in range(num_petals):
-        a0 = (math.pi * 2 / num_petals) * i
-        a1 = a0 + 0.4
-
-        x1, y1 = (math.cos(a0) * radius, math.sin(a0) * radius)
-        x2, y2 = (math.cos(a1) * radius, math.sin(a1) * radius)
-        x3, y3 = (0, 0)  # center
-
-        tri_transformed(M, x1, y1, x2, y2, x3, y3, 10)
 
 
 pyxel.run(update, draw)
