@@ -1,5 +1,6 @@
 import pyxel
 import math
+import random
 
 # -------------------------------------------------
 # Matrix Transform Functions
@@ -131,17 +132,10 @@ def circle_transformed(M, cx, cy, r, col, segments=32, outline=False):
 
 pyxel.init(200, 150, title="Matrix Transform Demo")
 
-# assign some positions for "stars"
-stars = [
-    (-80, -60),
-    (-50, -20),
-    (0, -70),
-    (50, -50),
-    (-30, 40),
-    (20, 70),
-    (70, 10),
-    (-70, 20),
-]
+# assign some random positions for "stars"
+stars = []
+for _ in range(200):
+    stars.append((random.randint(-200, 200), random.randint(-200, 200)))
 
 # state
 angle = 0
@@ -162,7 +156,7 @@ def update():
     # Transform: scale → rotate → translate
     M_scale = mat_scale(s, s)
     M_rotate = mat_rotate(angle)
-    M_translate = mat_translate(100, 75)
+    M_translate = mat_translate(100, 75)  # center around (0, 0)
 
     M = mat_mul(M_translate, mat_mul(M_rotate, M_scale))
 
