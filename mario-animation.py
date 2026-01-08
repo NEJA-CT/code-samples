@@ -3,7 +3,7 @@ import pyxel
 W, H = 320, 240
 pyxel.init(W, H, title="mario moves")
 
-mario_image = pyxel.Image.from_image("../assets/mario.png")
+mario_image = pyxel.Image.from_image("assets/mario.png")
 pyxel.images[0] = mario_image
 
 
