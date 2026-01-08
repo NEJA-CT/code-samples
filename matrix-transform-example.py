@@ -1,7 +1,7 @@
 import pyxel
 import math
 
-from .transforms import (
+from transforms import (
     mat_translate,
     mat_rotate,
     mat_mul,
@@ -38,10 +38,20 @@ def update():
 
     # This is where we update the transformation matrix M
 
-    # First, uncomment this next line, which rotates the matrix 45 degress
-    M = mat_rotate(math.radians(45))
+    # First, uncomment this next line, which translates the matrix by (30, -10)
+    # M = mat_translate(30, -10)
 
-    # Does this look correct? No, because the rotation is around the origin (0,0).
+    # When you update the matrix M, it then is applied to all points in the draw() function,
+    # so you should see the shape move by (30, -10) pixels each frame.
+
+    # Next, uncomment this next line, which rotates the matrix 45 degress.
+    # Since we are overwriting M, the translation above is lost, and it should only rotate.
+    # M = mat_rotate(math.radians(45))
+
+    # Does this look correct? No! Why?...
+    # The rotation is around the origin (0,0), which is the top-left corner of the window.
+    # So the shape is rotating around that point, which makes it go off-screen.
+    # To fix this, we need to rotate around the center of the shape.
     # To rotate around the center of the shape, we need to:
     # 1. Translate the shape so that its center is at the origin
     # 2. Apply the rotation
